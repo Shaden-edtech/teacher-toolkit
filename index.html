@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body>
+<title>Teacher Toolkit Online</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: a tool shelf (grouped cards) that opens one tool at a time on a paper-like panel. */
+:root {
+  --bg: #f3f5f9; --card: #ffffff; --ink: #1c2435; --muted: #5b6478; --line: #dde2ec; --soft: #eef2fb;
+  --accent: #2856d8; --accent-ink: #ffffff; --ok: #157a42; --ok-bg: #e6f5ec; --bad: #b3261e; --bad-bg: #fcebe9;
+  --pdf: #d9413f; --conv: #2856d8; --form: #8645c2; --av: #d46a12; --sch: #0f8f80;
+  --display: "Lexend", "Segoe UI", system-ui, sans-serif; --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161f; --card: #1b2130; --ink: #e8ecf4; --muted: #9aa4b8; --line: #2d3547; --soft: #222a3c;
+  --accent: #7d9dff; --accent-ink: #0d1430; --ok: #6fd39b; --ok-bg: #16301f; --bad: #ff9b92; --bad-bg: #3a1a18;
+  --pdf: #e86664; --conv: #5b82f0; --form: #a875dc; --av: #e58a3a; --sch: #2fb3a3; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #12161f; --card: #1b2130; --ink: #e8ecf4; --muted: #9aa4b8; --line: #2d3547; --soft: #222a3c;
+  --accent: #7d9dff; --accent-ink: #0d1430; --ok: #6fd39b; --ok-bg: #16301f; --bad: #ff9b92; --bad-bg: #3a1a18;
+  --pdf: #e86664; --conv: #5b82f0; --form: #a875dc; --av: #e58a3a; --sch: #2fb3a3; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.5 var(--body); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 20px var(--display); color: var(--ink); text-decoration: none; }
+.logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 18px; }
+.private { color: var(--muted); font-size: 15px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; }
+.hero { text-align: center; padding: 18px 0 8px; }
+.hero h1 { font-size: clamp(26px, 4vw, 34px); margin: 0 0 6px; }
+.hero p { margin: 0 0 16px; color: var(--muted); }
+#search { width: min(560px, 100%); padding: 13px 16px; font: inherit; border: 2px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); }
+#search:focus, input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+.group h2 { font-size: 18px; margin: 26px 0 10px; display: flex; align-items: center; gap: 8px; }
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; cursor: pointer; text-align: left; font: inherit; color: inherit; display: flex; gap: 12px; align-items: flex-start; }
+.card:hover, .card:focus-visible { border-color: var(--accent); outline: none; box-shadow: 0 4px 14px rgba(20,30,60,.10); }
+.card b { display: block; font-family: var(--display); font-weight: 600; font-size: 16px; }
+.card .d { color: var(--muted); font-size: 15px; }
+.icon { flex: none; width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; font-size: 21px; color: #fff; }
+.pc { margin-top: 28px; padding: 16px; border: 1px dashed var(--line); border-radius: 14px; color: var(--muted); font-size: 15px; }
+.pc b { color: var(--ink); }
+.empty { color: var(--muted); text-align: center; margin-top: 24px; }
+.back { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 6px 0; margin-bottom: 8px; }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 22px; max-width: 760px; margin: 0 auto; }
+.head { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.head h1 { margin: 0; font-size: 23px; }
+.head p { margin: 2px 0 0; color: var(--muted); }
+.drop { border: 3px dashed var(--line); border-radius: 14px; padding: 24px 14px; text-align: center; background: var(--soft); }
+.drop.over { border-color: var(--accent); }
+.drop p { margin: 4px 0; }
+.drop .big { font: 600 18px var(--display); }
+.hint { color: var(--muted); font-size: 14px; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; padding: 11px 20px; font: 600 16px var(--body); border-radius: 10px; cursor: pointer; }
+.btn.secondary { background: var(--soft); color: var(--ink); border: 1px solid var(--line); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn:focus-visible, .card:focus-visible, .back:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.go { width: 100%; font-size: 18px; padding: 14px; margin-top: 16px; }
+.files { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.files li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.files .n { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files .s { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.files button { border: 1px solid var(--line); background: var(--soft); color: var(--ink); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; }
+.opts { margin-top: 14px; display: grid; gap: 14px; }
+.lbl { display: block; font-weight: 600; margin-bottom: 6px; }
+.sub { color: var(--muted); font-size: 14px; margin: -2px 0 6px; }
+.opt input[type=text], .opt input[type=number], .opt select, .opt textarea { width: 100%; padding: 10px 12px; font: inherit; border: 2px solid var(--line); border-radius: 10px; background: var(--card); color: var(--ink); }
+.opt textarea { min-height: 150px; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices label { border: 2px solid var(--line); border-radius: 10px; padding: 8px 13px; cursor: pointer; }
+.choices input { position: absolute; opacity: 0; pointer-events: none; }
+.choices label:has(input:checked) { border-color: var(--accent); background: var(--soft); font-weight: 600; }
+.choices label:has(input:focus-visible) { outline: 3px solid var(--accent); }
+.check { display: flex; gap: 10px; align-items: center; cursor: pointer; }
+.check input { width: 20px; height: 20px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.busy { text-align: center; padding: 20px 0 4px; }
+.spin { width: 40px; height: 40px; border: 5px solid var(--line); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 8px; animation: r 1s linear infinite; }
+@keyframes r { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 3s; } }
+.result { margin-top: 16px; padding: 16px; border-radius: 12px; }
+.result.ok { background: var(--ok-bg); }
+.result.bad { background: var(--bad-bg); color: var(--bad); }
+.result h3 { margin: 0 0 6px; font-size: 18px; }
+.result .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.result pre { white-space: pre-wrap; word-break: break-all; background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-size: 13px; }
+.result ul { margin: 6px 0 0; padding-left: 20px; }
+.result img.qr { max-width: 260px; background: #fff; padding: 8px; border-radius: 8px; display: block; margin-top: 8px; }
+.report { list-style: none; padding: 0; display: grid; gap: 8px; }
+.report li { background: var(--card); color: var(--ink); border-radius: 10px; padding: 10px; }
+.tag.y { color: var(--ok); font-weight: 700; } .tag.n { color: var(--bad); font-weight: 700; }
+.help { max-width: 760px; margin: 14px auto 0; color: var(--muted); font-size: 15px; }
+.help b { color: var(--ink); }
+footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 30px; }
+@media (max-width: 520px) { .panel { padding: 16px; } .row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <a href="#" class="brand" id="homeLink"><span class="logo">T</span>Teacher Toolkit Online</a>
+    <span class="private">🔒 Files are processed in your browser and never uploaded</span>
+  </header>
+
+  <main id="home">
+    <section class="hero">
+      <h1>What do you want to do?</h1>
+      <p>Quick PDF, picture, audio and Schoology tools. No install, works on Chromebooks.</p>
+      <input id="search" type="search" placeholder="Search, for example: merge, MP3, QR, pictures…" aria-label="Search tools">
+    </section>
+    <div id="groups"></div>
+    <div class="pc"><b>Need Word ↔ PDF, video cutting, subtitles or recording?</b> Those need the full <b>Teacher Toolkit for your PC</b> (free, runs on Windows or Mac). Ask the teacher who shared this page for the zip file.</div>
+  </main>
+
+  <main id="tool" hidden>
+    <button class="back" id="back">← All tools</button>
+    <div class="panel">
+      <div class="head"><span class="icon" id="tIcon"></span><div><h1 id="tTitle"></h1><p id="tDesc"></p></div></div>
+      <form id="tForm" autocomplete="off">
+        <div id="drop" class="drop">
+          <input type="file" id="fileInput" hidden>
+          <p class="big" id="dropBig">Drag your file here</p><p>or</p>
+          <button type="button" class="btn" id="pick">Choose file</button>
+          <p class="hint" id="acceptHint"></p>
+        </div>
+        <ul id="fileList" class="files"></ul>
+        <div id="opts" class="opts"></div>
+        <button type="submit" class="btn go" id="goBtn">Start</button>
+      </form>
+      <div id="busy" class="busy" hidden><div class="spin"></div><p id="busyText">Working on it…</p></div>
+      <div id="result" class="result" hidden></div>
+    </div>
+    <p class="help" id="tHelp"></p>
+  </main>
+  <footer>Teacher Toolkit Online · Lite version · Your files never leave this device.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+"use strict";
+const PDF = [".pdf"], IMAGES = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"];
+const MEDIA = [".mp4", ".mov", ".m4v", ".webm", ".mp3", ".wav", ".m4a", ".aac", ".ogg", ".opus", ".flac"];
+const $ = s => document.querySelector(s);
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+class UserError extends Error {}
+
+// ---------------------------------------------------------------- tool list
+const pagesOpt = { type: "text", name: "pages", label: "Which pages?", sub: "Leave empty for all pages. Example: 1-3, 5, 8", placeholder: "all pages" };
+const GROUPS = [
+  { name: "Organize PDFs", color: "var(--pdf)", tools: [
+    { id: "merge", icon: "➕", title: "Merge PDFs", desc: "Join several PDFs into one, in your order.", accept: PDF, multiple: true, min: 2, order: true, keywords: "combine join", run: mergePdf },
+    { id: "split", icon: "✂️", title: "Split, remove or reorder pages", desc: "Keep some pages, delete pages, change the order, or save each page alone.", accept: PDF, run: splitPdf,
+      options: [{ type: "choice", name: "mode", label: "What do you want?", value: "keep", choices: [["keep", "Keep these pages"], ["remove", "Delete these pages"], ["each", "Every page as its own PDF"]] }, pagesOpt],
+      help: "<b>Change the order:</b> choose Keep these pages and write the new order, for example 3, 1, 2, 4-10.", keywords: "extract delete order" },
+    { id: "rotate", icon: "🔄", title: "Rotate pages", desc: "Turn sideways or upside-down pages the right way.", accept: PDF, run: rotatePdf,
+      options: [{ type: "choice", name: "angle", label: "Turn", value: "90", choices: [["90", "Right ↻"], ["270", "Left ↺"], ["180", "Upside down"]] }, pagesOpt] },
+    { id: "numbers", icon: "🔢", title: "Add page numbers", desc: "Number every page of a booklet or exam.", accept: PDF, run: numberPdf,
+      options: [{ type: "choice", name: "style", label: "Style", value: "of", choices: [["n", "1"], ["page", "Page 1"], ["of", "Page 1 of 10"]] }, { type: "choice", name: "pos", label: "Where", value: "center", choices: [["left", "Bottom left"], ["center", "Bottom middle"], ["right", "Bottom right"]] }] },
+    { id: "watermark", icon: "💧", title: "Add a watermark", desc: "Write SAMPLE, DRAFT or your school name across every page.", accept: PDF, run: watermarkPdf,
+      options: [{ type: "text", name: "text", label: "Watermark text", placeholder: "for example: SAMPLE" }], keywords: "stamp" },
+    { id: "shrink", icon: "🗜️", title: "Make a PDF smaller", desc: "Shrink big scanned PDFs so they upload faster.", accept: PDF, run: shrinkPdf,
+      options: [{ type: "choice", name: "level", label: "How much smaller?", value: "medium", choices: [["low", "A little"], ["medium", "Medium"], ["high", "As small as possible"]] }],
+      help: "Best for scanned pages and photos. Pages are saved as pictures, so text can no longer be selected. For PDFs made in Word, use the PC toolkit's Compress PDF.", keywords: "compress reduce size" },
+  ]},
+  { name: "Pictures", color: "var(--conv)", tools: [
+    { id: "pdf-to-images", icon: "🖼️", title: "PDF to pictures", desc: "Save each page as a JPG or PNG.", accept: PDF, run: pdfToImages,
+      options: [{ type: "choice", name: "format", label: "Picture type", value: "jpg", choices: [["jpg", "JPG"], ["png", "PNG"]] }, { type: "choice", name: "scale", label: "Quality", value: "2", choices: [["1.4", "Screen"], ["2", "Good"], ["4", "Print"]] }], keywords: "jpg png image" },
+    { id: "images-to-pdf", icon: "📷", title: "Pictures to PDF", desc: "Turn photos of homework or worksheets into one PDF.", accept: IMAGES, multiple: true, order: true, run: imagesToPdf,
+      options: [{ type: "choice", name: "size", label: "Page size", value: "a4", choices: [["a4", "A4"], ["letter", "Letter"], ["fit", "Same as picture"]] }],
+      help: "Use ▲ ▼ to set the page order. iPhone HEIC photos are not supported in the browser: set the iPhone camera to 'Most Compatible', or use the PC toolkit.", keywords: "photo scan jpg png" },
+    { id: "convert-images", icon: "🎨", title: "Convert or shrink pictures", desc: "Change PNG/WEBP to JPG, or make big photos smaller.", accept: IMAGES, multiple: true, run: convertImages,
+      options: [{ type: "choice", name: "format", label: "Change to", value: "jpg", choices: [["jpg", "JPG"], ["png", "PNG"], ["webp", "WEBP"]] }, { type: "select", name: "maxw", label: "Size", value: "1600", choices: [["0", "Keep the same size"], ["1920", "Large (1920 wide)"], ["1600", "Medium (1600 wide)"], ["800", "Small (800 wide)"]] }], keywords: "resize jpg png webp photo" },
+  ]},
+  { name: "Worksheets & audio", color: "var(--form)", tools: [
+    { id: "worksheet", icon: "🧾", title: "Make a fillable worksheet", desc: "Type your questions. Get a PDF students can type answers into.", noFile: true, run: makeWorksheet,
+      options: [{ type: "text", name: "title", label: "Title", placeholder: "Unit 3 – Reading comprehension" }, { type: "text", name: "instructions", label: "Instructions (optional)", placeholder: "Read the text and answer the questions." },
+        { type: "textarea", name: "questions", label: "Questions", sub: "One question per line. For multiple choice, put each choice on its own line under the question, starting with a dash (-).", placeholder: "What is the main idea of the passage?\nWhich word means 'very big'?\n- tiny\n- huge\n- quick\nWrite a short summary in your own words." },
+        { type: "choice", name: "box", label: "Answer box size", value: "medium", choices: [["small", "One line"], ["medium", "A few lines"], ["large", "Paragraph"]] }],
+      help: "<b>With Schoology:</b> attach the PDF to an Assignment. Students download it, type in the boxes (Edge, Chrome, Adobe Reader or iPad) and submit it back.", keywords: "quiz test form fillable" },
+    { id: "mp3", icon: "🎵", title: "Video or audio to MP3", desc: "Take the sound out of a video, and cut it, for listening practice.", accept: MEDIA, run: toMp3,
+      options: [{ type: "times" }, { type: "choice", name: "kbps", label: "Quality", value: "128", choices: [["96", "Small file"], ["128", "Normal"], ["192", "High"]] }],
+      help: "Works best with files under about 30 minutes. Longer videos: use the PC toolkit.", keywords: "mp4 audio sound listening cut trim" },
+  ]},
+  { name: "Schoology", color: "var(--sch)", tools: [
+    { id: "check", icon: "✅", title: "Ready for Schoology?", desc: "Check file type and size before uploading, and how to fix problems.", accept: null, multiple: true, run: schoologyCheck, keywords: "upload size check" },
+    { id: "embed", icon: "🧩", title: "Embed code maker", desc: "Turn a YouTube, Google Drive, Docs, Slides or Forms link into embed code.", noFile: true, run: embedCode,
+      options: [{ type: "text", name: "url", label: "Paste the link", placeholder: "https://www.youtube.com/watch?v=…" }],
+      help: "<b>In Schoology:</b> Add Materials → Add Page, click the embed or &lt;/&gt; button in the editor, and paste the code.", keywords: "youtube iframe link google" },
+    { id: "qr", icon: "🔳", title: "QR code maker", desc: "A code students scan to open a Schoology page, video or form.", noFile: true, run: qrCode,
+      options: [{ type: "text", name: "url", label: "Link", placeholder: "https://app.schoology.com/course/…" }, { type: "text", name: "label", label: "Words under the code (optional)", placeholder: "Scan for the listening audio" }], keywords: "qr scan phone" },
+    { id: "youtube", icon: "▶️", title: "YouTube videos", desc: "How to use YouTube videos in class without downloading.", special: "youtube", noFile: true, keywords: "youtube download" },
+  ]},
+];
+const ALL = GROUPS.flatMap(g => g.tools.map(t => ({ ...t, group: g })));
+let current = null, chosen = [];
+
+// ---------------------------------------------------------------- page
+function renderHome(q = "") {
+  q = q.trim().toLowerCase();
+  const wrap = $("#groups"); wrap.innerHTML = ""; let n = 0;
+  for (const g of GROUPS) {
+    const list = g.tools.filter(t => !q || (t.title + " " + t.desc + " " + (t.keywords || "")).toLowerCase().includes(q));
+    if (!list.length) continue; n += list.length;
+    const sec = document.createElement("section"); sec.className = "group";
+    sec.innerHTML = `<h2><span class="dot" style="background:${g.color}"></span>${g.name}</h2><div class="grid"></div>`;
+    for (const t of list) {
+      const b = document.createElement("button"); b.className = "card";
+      b.innerHTML = `<span class="icon" style="background:${g.color}">${t.icon}</span><span><b>${t.title}</b><span class="d">${t.desc}</span></span>`;
+      b.onclick = () => { location.hash = t.id; };
+      sec.querySelector(".grid").appendChild(b);
+    }
+    wrap.appendChild(sec);
+  }
+  if (!n) wrap.innerHTML = `<p class="empty">No tool matches "${esc(q)}". Try PDF, pictures, MP3 or QR.</p>`;
+}
+
+function openTool(t) {
+  current = t; chosen = [];
+  $("#home").hidden = true; $("#tool").hidden = false;
+  $("#tIcon").textContent = t.icon; $("#tIcon").style.background = t.group.color;
+  $("#tTitle").textContent = t.title; $("#tDesc").textContent = t.desc; $("#tHelp").innerHTML = t.help || "";
+  $("#result").hidden = true; $("#busy").hidden = true;
+  const input = $("#fileInput"); input.value = ""; input.multiple = !!t.multiple; input.accept = t.accept ? t.accept.join(",") : "";
+  $("#drop").hidden = !!t.noFile;
+  $("#dropBig").textContent = t.multiple ? "Drag your files here" : "Drag your file here";
+  $("#acceptHint").textContent = t.accept ? "Accepted: " + t.accept.join(" ") : "Any file";
+  $("#goBtn").hidden = t.special === "youtube";
+  $("#goBtn").textContent = { check: "Check files", embed: "Make embed code", qr: "Make QR code", worksheet: "Make worksheet" }[t.id] || "Start";
+  renderOptions(t); renderFiles();
+  if (t.special === "youtube") youtubeInfo();
+  window.scrollTo(0, 0);
+}
+
+function renderOptions(t) {
+  const box = $("#opts"); box.innerHTML = "";
+  for (const o of t.options || []) {
+    const d = document.createElement("div"); d.className = "opt";
+    const sub = o.sub ? `<p class="sub">${o.sub}</p>` : "";
+    if (o.type === "text") d.innerHTML = `<label class="lbl" for="o_${o.name}">${o.label}</label>${sub}<input id="o_${o.name}" type="text" name="${o.name}" placeholder="${o.placeholder || ""}">`;
+    else if (o.type === "textarea") d.innerHTML = `<label class="lbl" for="o_${o.name}">${o.label}</label>${sub}<textarea id="o_${o.name}" name="${o.name}" placeholder="${o.placeholder || ""}"></textarea>`;
+    else if (o.type === "select") d.innerHTML = `<label class="lbl" for="o_${o.name}">${o.label}</label><select id="o_${o.name}" name="${o.name}">${o.choices.map(([v, l]) => `<option value="${v}" ${v === o.value ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+    else if (o.type === "choice") d.innerHTML = `<span class="lbl">${o.label}</span>${sub}<div class="choices" role="radiogroup" aria-label="${o.label}">${o.choices.map(([v, l]) => `<label><input type="radio" name="${o.name}" value="${v}" ${v === o.value ? "checked" : ""}>${l}</label>`).join("")}</div>`;
+    else if (o.type === "times") d.innerHTML = `<span class="lbl">Cut (optional)</span><p class="sub">Leave empty to keep it all. Write times like 1:30 (minutes:seconds).</p><div class="row"><div><label class="lbl" for="o_start">Start at</label><input id="o_start" type="text" name="start" placeholder="0:00"></div><div><label class="lbl" for="o_end">End at</label><input id="o_end" type="text" name="end" placeholder="the end"></div></div>`;
+    box.appendChild(d);
+  }
+}
+
+function addFiles(list) {
+  let bad = false, added = false;
+  for (const f of list) {
+    if (current.accept && !current.accept.includes(ext(f.name))) { showError(`"${f.name}" is not the right kind of file for this tool. Accepted: ${current.accept.join(" ")}`); bad = true; continue; }
+    if (current.multiple) chosen.push(f); else chosen = [f];
+    added = true;
+  }
+  if (added && !bad) $("#result").hidden = true;
+  renderFiles();
+}
+function renderFiles() {
+  const ul = $("#fileList"); ul.innerHTML = "";
+  chosen.forEach((f, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span aria-hidden="true">📎</span><span class="n"></span><span class="s">${size(f.size)}</span>` +
+      (current.order && chosen.length > 1 ? `<button type="button" aria-label="Move up" data-a="up">▲</button><button type="button" aria-label="Move down" data-a="down">▼</button>` : "") +
+      `<button type="button" aria-label="Remove" data-a="rm">✕</button>`;
+    li.querySelector(".n").textContent = f.name;
+    li.querySelectorAll("button").forEach(b => b.onclick = () => {
+      const a = b.dataset.a;
+      if (a === "rm") chosen.splice(i, 1);
+      if (a === "up" && i > 0) [chosen[i - 1], chosen[i]] = [chosen[i], chosen[i - 1]];
+      if (a === "down" && i < chosen.length - 1) [chosen[i + 1], chosen[i]] = [chosen[i], chosen[i + 1]];
+      renderFiles();
+    });
+    ul.appendChild(li);
+  });
+  $("#pick").textContent = chosen.length ? (current.multiple ? "Add more files" : "Choose a different file") : (current.multiple ? "Choose files" : "Choose file");
+}
+
+async function submit(e) {
+  e.preventDefault();
+  const t = current;
+  if (!t.noFile && !chosen.length) return showError(t.multiple ? "Please choose your files first." : "Please choose a file first.");
+  if (t.min && chosen.length < t.min) return showError(`Please choose at least ${t.min} files.`);
+  const opts = Object.fromEntries(new FormData($("#tForm")).entries());
+  setBusy(true, t.id === "mp3" ? "Working on it… Longer videos take a minute. Keep this page open." : "Working on it…");
+  await new Promise(r => setTimeout(r, 30)); // let the spinner show
+  try {
+    const out = await t.run(chosen, opts);
+    setBusy(false);
+    if (out && out.html) return showHtml(out.html, out.after);
+    showDone(out.name, out.blob);
+  } catch (err) {
+    setBusy(false);
+    if (!(err instanceof UserError)) console.error(err);
+    showError(err instanceof UserError ? err.message : "Something went wrong: " + (err && err.message || err) + ". If the file is damaged or very big, try another one.");
+  }
+}
+
+// ---------------------------------------------------------------- saving files
+const ALLOWED = ["gif", "png", "jpg", "jpeg", "webp", "mp4", "webm", "txt", "json", "md", "docx", "pptx", "csv", "html", "svg", "pdf", "xlsx", "zip"];
+let downloadsCap;
+function getDownloads() {
+  if (downloadsCap === undefined) downloadsCap = (window.claude && window.claude.use) ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+  return downloadsCap;
+}
+async function saveFile(name, blob, btn) {
+  const dl = await getDownloads();
+  if (!dl) { // opened as a normal web page: a plain download link works
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    return;
+  }
+  let file = name, data = blob;
+  if (!ALLOWED.includes(ext(name).slice(1))) { // e.g. MP3: hand it over inside a zip
+    const z = new JSZip(); z.file(name, blob); data = await z.generateAsync({ type: "blob" }); file = name.replace(/\.[^.]+$/, "") + ".zip";
+  }
+  try { await dl.save({ filename: file, data }); btn.textContent = "Saved ✓"; }
+  catch (err) {
+    const c = err && err.code;
+    if (c === "declined") return;
+    if (c === "rate_limited") { btn.textContent = "Wait a moment, then try again"; return; }
+    showError("Your browser could not save the file here (" + (c || "unknown") + "). Open this page in Chrome or Edge on a computer and try again.");
+  }
+}
+function showDone(name, blob) {
+  const r = $("#result"); r.className = "result ok"; r.hidden = false;
+  const zipNote = ext(name) === ".mp3" && downloadsCapResolved ? `<p class="hint">The MP3 comes inside a .zip file. Double-click the zip to open it.</p>` : "";
+  r.innerHTML = `<h3>✅ Done!</h3><p><b></b> (${size(blob.size)})</p>${blob.size > 512 * 1048576 ? "<p>⚠️ Over Schoology's 512 MB limit.</p>" : ""}${zipNote}
+    <div class="actions"><button class="btn" type="button" id="saveBtn">⬇ Download</button><button class="btn secondary" type="button" id="again">Start over</button></div>`;
+  r.querySelector("p b").textContent = name;
+  $("#saveBtn").onclick = e => saveFile(name, blob, e.currentTarget);
+  $("#again").onclick = () => openTool(current);
+  r.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+let downloadsCapResolved = false;
+getDownloads().then(d => { downloadsCapResolved = !!d; });
+
+// ---------------------------------------------------------------- PDF tools (pdf-lib)
+const { PDFDocument, StandardFonts, rgb, degrees } = window.PDFLib || {};
+async function loadPdf(f) {
+  try { return await PDFDocument.load(await f.arrayBuffer()); }
+  catch (e) {
+    if (/encrypt/i.test(e.message)) throw new UserError(`"${f.name}" is password protected. Remove the password first (PC toolkit: Unlock PDF).`);
+    throw new UserError(`"${f.name}" could not be opened. Is it a real PDF?`);
+  }
+}
+function parsePages(text, count) {
+  text = (text || "").replace(/\s/g, "").toLowerCase();
+  if (!text || text === "all") return [...Array(count).keys()];
+  const out = [];
+  for (const part of text.split(",").filter(Boolean)) {
+    let m = part.match(/^(\d*)-(\d*)$/), a, b;
+    if (m) { a = +(m[1] || 1); b = +(m[2] || count); }
+    else if (/^\d+$/.test(part)) a = b = +part;
+    else throw new UserError(`I did not understand the pages "${part}". Write them like 1-3, 5, 8`);
+    if (a < 1 || b > count || a > b) throw new UserError(`Pages ${part} do not exist. This PDF has ${count} pages.`);
+    for (let i = a; i <= b; i++) out.push(i - 1);
+  }
+  return out;
+}
+const pdfBlob = async doc => new Blob([await doc.save()], { type: "application/pdf" });
+const stem = n => n.replace(/\.[^.]+$/, "");
+
+async function mergePdf(files) {
+  const out = await PDFDocument.create();
+  for (const f of files) { const d = await loadPdf(f); (await out.copyPages(d, d.getPageIndices())).forEach(p => out.addPage(p)); }
+  return { name: "merged.pdf", blob: await pdfBlob(out) };
+}
+async function splitPdf([f], o) {
+  const src = await loadPdf(f), n = src.getPageCount();
+  if (o.mode === "each") {
+    const z = new JSZip();
+    for (let i = 0; i < n; i++) { const d = await PDFDocument.create(); const [p] = await d.copyPages(src, [i]); d.addPage(p); z.file(`${stem(f.name)} - page ${i + 1}.pdf`, await d.save()); }
+    return { name: stem(f.name) + " - pages.zip", blob: await z.generateAsync({ type: "blob" }) };
+  }
+  let idx = parsePages(o.pages, n);
+  if (o.mode === "remove") { const s = new Set(idx); idx = [...Array(n).keys()].filter(i => !s.has(i)); if (!idx.length) throw new UserError("You cannot remove every page."); }
+  const d = await PDFDocument.create(); (await d.copyPages(src, idx)).forEach(p => d.addPage(p));
+  return { name: `${stem(f.name)} - ${o.mode === "remove" ? "pages removed" : "selected pages"}.pdf`, blob: await pdfBlob(d) };
+}
+async function rotatePdf([f], o) {
+  const d = await loadPdf(f);
+  for (const i of parsePages(o.pages, d.getPageCount())) { const p = d.getPage(i); p.setRotation(degrees((p.getRotation().angle + +o.angle) % 360)); }
+  return { name: stem(f.name) + " - rotated.pdf", blob: await pdfBlob(d) };
+}
+// Draw text so it reads upright on the page as the viewer sees it, even on rotated pages.
+function uprightText(page, text, vx, vy, opt) {
+  const rot = page.getRotation().angle % 360, { width: W, height: H } = page.getSize();
+  let x = vx, y = vy; // viewer coordinates (origin bottom-left of the visible page)
+  if (rot === 90) { x = W - vy; y = vx; } else if (rot === 180) { x = W - vx; y = H - vy; } else if (rot === 270) { x = vy; y = H - vx; }
+  page.drawText(text, { ...opt, x, y, rotate: degrees(rot + (opt.extra || 0)) });
+}
+function viewSize(page) { const { width, height } = page.getSize(), r = page.getRotation().angle % 180; return r ? { w: height, h: width } : { w: width, h: height }; }
+async function numberPdf([f], o) {
+  const d = await loadPdf(f), font = await d.embedFont(StandardFonts.Helvetica), pages = d.getPages();
+  pages.forEach((p, i) => {
+    const label = o.style === "n" ? `${i + 1}` : o.style === "page" ? `Page ${i + 1}` : `Page ${i + 1} of ${pages.length}`;
+    const { w } = viewSize(p), tw = font.widthOfTextAtSize(label, 10);
+    const x = o.pos === "left" ? 36 : o.pos === "right" ? w - tw - 36 : (w - tw) / 2;
+    uprightText(p, label, x, 20, { size: 10, font, color: rgb(.2, .2, .2) });
+  });
+  return { name: stem(f.name) + " - numbered.pdf", blob: await pdfBlob(d) };
+}
+async function watermarkPdf([f], o) {
+  const text = (o.text || "").trim();
+  if (!text) throw new UserError("Please type the watermark text, for example SAMPLE or your school name.");
+  const d = await loadPdf(f), font = await d.embedFont(StandardFonts.HelveticaBold);
+  let safe = text.replace(/[^\x20-\x7E -ÿ]/g, "");
+  if (!safe.trim()) throw new UserError("The online version can only write English letters in watermarks. Use the PC toolkit for other languages.");
+  for (const p of d.getPages()) {
+    const { w, h } = viewSize(p), size = Math.max(20, Math.min(80, w * 1.1 / safe.length)), tw = font.widthOfTextAtSize(safe, size);
+    const a = Math.PI / 4, cx = w / 2 - (tw / 2) * Math.cos(a) + (size / 3) * Math.sin(a), cy = h / 2 - (tw / 2) * Math.sin(a) - (size / 3) * Math.cos(a);
+    uprightText(p, safe, cx, cy, { size, font, color: rgb(.55, .55, .55), opacity: .3, extra: 45 });
+  }
+  return { name: stem(f.name) + " - watermark.pdf", blob: await pdfBlob(d) };
+}
+
+// ---------------------------------------------------------------- PDF to pictures (pdf.js)
+async function openWithPdfjs(f) {
+  try { return await pdfjsLib.getDocument({ data: new Uint8Array(await f.arrayBuffer()) }).promise; }
+  catch (e) { throw new UserError(e && e.name === "PasswordException" ? `"${f.name}" is password protected.` : `"${f.name}" could not be opened. Is it a real PDF?`); }
+}
+async function renderPage(pdf, i, scale) {
+  const page = await pdf.getPage(i), vp = page.getViewport({ scale });
+  const c = document.createElement("canvas"); c.width = Math.ceil(vp.width); c.height = Math.ceil(vp.height);
+  const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  return { canvas: c, w: page.getViewport({ scale: 1 }).width, h: page.getViewport({ scale: 1 }).height };
+}
+const canvasBlob = (c, type, q) => new Promise(r => c.toBlob(r, type, q));
+async function pdfToImages([f], o) {
+  const pdf = await openWithPdfjs(f), z = new JSZip(), type = o.format === "png" ? "image/png" : "image/jpeg";
+  let last;
+  for (let i = 1; i <= pdf.numPages; i++) {
+    $("#busyText").textContent = `Page ${i} of ${pdf.numPages}…`;
+    const { canvas } = await renderPage(pdf, i, +o.scale);
+    last = await canvasBlob(canvas, type, .88); z.file(`${stem(f.name)} - page ${i}.${o.format}`, last);
+  }
+  if (pdf.numPages === 1) return { name: `${stem(f.name)}.${o.format}`, blob: last };
+  return { name: stem(f.name) + " - pictures.zip", blob: await z.generateAsync({ type: "blob" }) };
+}
+async function shrinkPdf([f], o) {
+  const pdf = await openWithPdfjs(f), out = await PDFDocument.create();
+  const [scale, q] = { low: [2, .8], medium: [1.5, .65], high: [1.1, .5] }[o.level] || [1.5, .65];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    $("#busyText").textContent = `Page ${i} of ${pdf.numPages}…`;
+    const { canvas, w, h } = await renderPage(pdf, i, scale);
+    const img = await out.embedJpg(await (await canvasBlob(canvas, "image/jpeg", q)).arrayBuffer());
+    out.addPage([w, h]).drawImage(img, { x: 0, y: 0, width: w, height: h });
+  }
+  const blob = await pdfBlob(out);
+  if (blob.size >= f.size) throw new UserError(`This PDF is already small (${size(f.size)}). Making it smaller would not help.`);
+  return { name: stem(f.name) + " - smaller.pdf", blob };
+}
+
+// ---------------------------------------------------------------- pictures
+async function loadImage(f) {
+  try { return await createImageBitmap(f, { imageOrientation: "from-image" }); }
+  catch { throw new UserError(`"${f.name}" could not be opened as a picture.`); }
+}
+function toCanvas(bmp, maxw, white) {
+  const s = maxw && bmp.width > maxw ? maxw / bmp.width : 1, c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  const ctx = c.getContext("2d"); if (white) { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height); }
+  ctx.drawImage(bmp, 0, 0, c.width, c.height); return c;
+}
+async function imagesToPdf(files, o) {
+  const d = await PDFDocument.create();
+  for (const f of files) {
+    const bmp = await loadImage(f), c = toCanvas(bmp, 2400, true);
+    const img = await d.embedJpg(await (await canvasBlob(c, "image/jpeg", .88)).arrayBuffer());
+    if (o.size === "fit") { const pg = d.addPage([c.width * .75, c.height * .75]); pg.drawImage(img, { x: 0, y: 0, width: c.width * .75, height: c.height * .75 }); continue; }
+    let [W, H] = o.size === "letter" ? [612, 792] : [595.28, 841.89];
+    if (c.width > c.height) [W, H] = [H, W];
+    const pg = d.addPage([W, H]), s = Math.min((W - 56) / c.width, (H - 56) / c.height);
+    pg.drawImage(img, { x: (W - c.width * s) / 2, y: (H - c.height * s) / 2, width: c.width * s, height: c.height * s });
+  }
+  return { name: (files.length === 1 ? stem(files[0].name) : "pictures") + ".pdf", blob: await pdfBlob(d) };
+}
+async function convertImages(files, o) {
+  const type = { jpg: "image/jpeg", png: "image/png", webp: "image/webp" }[o.format], outs = [];
+  for (const f of files) { const c = toCanvas(await loadImage(f), +o.maxw, o.format === "jpg"); outs.push([`${stem(f.name)}.${o.format}`, await canvasBlob(c, type, .85)]); }
+  if (outs.length === 1) return { name: outs[0][0], blob: outs[0][1] };
+  const z = new JSZip(); const seen = {};
+  for (const [n, b] of outs) { let nm = n; while (seen[nm]) nm = nm.replace(/(\.\w+)$/, " (2)$1"); seen[nm] = 1; z.file(nm, b); }
+  return { name: "pictures.zip", blob: await z.generateAsync({ type: "blob" }) };
+}
+
+// ---------------------------------------------------------------- worksheet maker
+async function makeWorksheet(_, o) {
+  const raw = (o.questions || "").trim();
+  if (!raw) throw new UserError("Please type at least one question.");
+  const items = [];
+  for (const line of raw.split(/\r?\n/)) { const s = line.trim(); if (!s) continue; if (/^[-*•]/.test(s) && items.length) items[items.length - 1].choices.push(s.replace(/^[-*•]\s*/, "")); else items.push({ q: s, choices: [] }); }
+  const d = await PDFDocument.create(), font = await d.embedFont(StandardFonts.Helvetica), bold = await d.embedFont(StandardFonts.HelveticaBold), form = d.getForm();
+  const W = 595.28, H = 841.89, M = 50, boxH = { small: 22, medium: 70, large: 150 }[o.box] || 70;
+  const clean = s => s.replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/[^\x20-\x7E -ÿ]/g, "?");
+  const wrap = (text, f, sz, maxW) => { const words = clean(text).split(" "), lines = []; let cur = ""; for (const w of words) { const t = cur ? cur + " " + w : w; if (f.widthOfTextAtSize(t, sz) > maxW && cur) { lines.push(cur); cur = w; } else cur = t; } if (cur) lines.push(cur); return lines; };
+  let page = d.addPage([W, H]), y = H - M;
+  const newPage = () => { page = d.addPage([W, H]); y = H - M; };
+  const field = (name, x, yTop, w, h, multi) => { const tf = form.createTextField(name); if (multi) tf.enableMultiline(); tf.addToPage(page, { x, y: yTop - h, width: w, height: h, borderColor: rgb(.55, .6, .7), backgroundColor: rgb(.96, .97, 1) }); tf.setFontSize(multi ? 11 : 0); };
+  page.drawText(clean((o.title || "Worksheet").trim() || "Worksheet"), { x: M, y: y - 18, size: 20, font: bold }); y -= 44;
+  for (const l of ["Name", "Date"]) { page.drawText(l + ":", { x: M, y: y - 14, size: 11, font }); field(l, M + 45, y, 255, 20, false); y -= 28; }
+  if ((o.instructions || "").trim()) { for (const l of wrap(o.instructions.trim(), font, 11, W - 2 * M)) { page.drawText(l, { x: M, y: y - 12, size: 11, font }); y -= 15; } }
+  y -= 12;
+  items.forEach((it, k) => {
+    const n = k + 1, lines = wrap(`${n}. ${it.q}`, font, 12, W - 2 * M);
+    const need = lines.length * 16 + 8 + (it.choices.length ? it.choices.length * 22 : boxH) + 18;
+    if (y - need < M) newPage();
+    for (const l of lines) { page.drawText(l, { x: M, y: y - 12, size: 12, font }); y -= 16; }
+    y -= 8;
+    if (it.choices.length) it.choices.forEach((c, j) => { const cb = form.createCheckBox(`Q${n} choice ${j + 1}`); cb.addToPage(page, { x: M + 10, y: y - 14, width: 14, height: 14, borderColor: rgb(.4, .45, .55) }); page.drawText(`${String.fromCharCode(97 + j)}) ${clean(c)}`, { x: M + 32, y: y - 11, size: 11, font }); y -= 22; });
+    else { field(`Q${n} answer`, M, y, W - 2 * M, boxH, o.box !== "small"); y -= boxH; }
+    y -= 18;
+  });
+  const pages = d.getPages(); pages.forEach((p, i) => p.drawText(`Page ${i + 1} of ${pages.length}`, { x: W / 2 - 25, y: 22, size: 9, font, color: rgb(.4, .4, .4) }));
+  return { name: clean((o.title || "Worksheet").trim() || "Worksheet").replace(/[\\/:*?"<>|]/g, "_") + ".pdf", blob: await pdfBlob(d) };
+}
+
+// ---------------------------------------------------------------- MP3 (Web Audio + lamejs)
+function parseTime(s, label) {
+  s = (s || "").trim().replace(",", "."); if (!s) return null;
+  const parts = s.split(":").map(Number);
+  if (parts.length > 3 || parts.some(n => isNaN(n) || n < 0)) throw new UserError(`The ${label} "${s}" is not a time. Write it like 1:30 (minutes:seconds).`);
+  return parts.reduce((a, n) => a * 60 + n, 0);
+}
+async function toMp3([f], o) {
+  if (!window.lamejs) throw new UserError("The MP3 maker did not load. Check the internet connection and reload the page.");
+  const start = parseTime(o.start, "start time") || 0, endIn = parseTime(o.end, "end time");
+  let audio;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  const ctx = new Ctx();
+  try { audio = await ctx.decodeAudioData(await f.arrayBuffer()); }
+  catch { throw new UserError(`The sound in "${f.name}" could not be read. The video may have no sound, or use a format this browser can't open (try Chrome, or the PC toolkit).`); }
+  finally { ctx.close && ctx.close(); }
+  const end = endIn == null ? audio.duration : Math.min(endIn, audio.duration);
+  if (start >= audio.duration) throw new UserError(`The start time is after the end (the file is ${clock(audio.duration)} long).`);
+  if (end <= start) throw new UserError("The end time must be after the start time.");
+  const sr = audio.sampleRate, ch = Math.min(2, audio.numberOfChannels), from = Math.floor(start * sr), to = Math.floor(end * sr);
+  const enc = new lamejs.Mp3Encoder(ch, sr, +o.kbps), chunks = [], block = 1152;
+  const conv = arr => { const out = new Int16Array(arr.length); for (let i = 0; i < arr.length; i++) { const v = Math.max(-1, Math.min(1, arr[i])); out[i] = v < 0 ? v * 0x8000 : v * 0x7FFF; } return out; };
+  const L = conv(audio.getChannelData(0).subarray(from, to)), R = ch > 1 ? conv(audio.getChannelData(1).subarray(from, to)) : null;
+  for (let i = 0; i < L.length; i += block) {
+    const buf = R ? enc.encodeBuffer(L.subarray(i, i + block), R.subarray(i, i + block)) : enc.encodeBuffer(L.subarray(i, i + block));
+    if (buf.length) chunks.push(new Uint8Array(buf));
+    if (i % (block * 2000) === 0) { $("#busyText").textContent = `Making the MP3… ${Math.round(i / L.length * 100)}%`; await new Promise(r => setTimeout(r)); }
+  }
+  const last = enc.flush(); if (last.length) chunks.push(new Uint8Array(last));
+  return { name: stem(f.name) + ".mp3", blob: new Blob(chunks, { type: "audio/mpeg" }) };
+}
+
+// ---------------------------------------------------------------- Schoology helpers
+const SCH_OK = [".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png", ".gif", ".mp4", ".mp3", ".mov", ".wmv", ".m4a", ".wav", ".txt", ".rtf", ".zip", ".csv"];
+const FIX = { ".heic": "iPhone photo: turn it into JPG first (Schoology and many browsers can't show .heic).", ".webp": "Turn it into JPG with 'Convert or shrink pictures'.", ".avi": "Convert it to MP4 with the PC toolkit so it plays in Schoology.", ".mkv": "Convert it to MP4 with the PC toolkit.", ".webm": "MP4 plays on more devices. Convert it with the PC toolkit.", ".pages": "Export it from Pages as PDF or Word first.", ".key": "Export it from Keynote as PowerPoint or PDF first.", ".odt": "Save it as PDF or Word first." };
+async function schoologyCheck(files) {
+  const rows = [];
+  for (const f of files) {
+    const e = ext(f.name), mb = f.size / 1048576, notes = []; let ok = true;
+    if (mb > 512) { ok = false; notes.push(`Too big for Schoology (${mb.toFixed(0)} MB; the limit is 512 MB).` + (e === ".pdf" ? " Try 'Make a PDF smaller'." : " Make it smaller with the PC toolkit, or upload it to Google Drive and add it as a link.")); }
+    else if (mb > 100 && [".mp4", ".mov", ".wmv"].includes(e)) notes.push(`${mb.toFixed(0)} MB is allowed, but slow for students. The PC toolkit can make it 3 to 5 times smaller.`);
+    else if (mb > 20 && e === ".pdf") notes.push(`${mb.toFixed(0)} MB is allowed, but 'Make a PDF smaller' will help students open it faster.`);
+    if (FIX[e]) { notes.push(FIX[e]); if (!SCH_OK.includes(e)) ok = false; }
+    else if (!SCH_OK.includes(e)) { ok = false; notes.push("Students may not be able to open this kind of file in Schoology. PDF is the safest choice."); }
+    if (e === ".pdf") { try { const d = await PDFDocument.load(await f.arrayBuffer()); if (d.getForm().getFields().length) notes.push("It has fill-in boxes: students can type in it and upload it back."); } catch (err) { if (/encrypt/i.test(err.message)) { ok = false; notes.push("It has a password, so students cannot open it."); } else { ok = false; notes.push("The PDF seems damaged."); } } }
+    rows.push(`<li><span class="tag ${ok ? "y" : "n"}">${ok ? "✅ OK" : "⚠️ Fix first"}</span> <b>${esc(f.name)}</b> (${size(f.size)})<br>${(notes.length ? notes : ["Ready to upload."]).map(esc).join("<br>")}</li>`);
+  }
+  return { html: `<h3>Schoology check</h3><ul class="report">${rows.join("")}</ul><p class="hint">Schoology allows files up to 512 MB each.</p>` };
+}
+async function embedCode(_, o) {
+  const url = (o.url || "").trim(); if (!url) throw new UserError("Please paste a link first.");
+  let src, kind, m;
+  if ((m = url.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/))) { const t = url.match(/[?&]t=(\d+)/); src = `https://www.youtube-nocookie.com/embed/${m[1]}?rel=0${t ? "&start=" + t[1] : ""}`; kind = "YouTube video"; }
+  else if ((m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/))) { src = `https://drive.google.com/file/d/${m[1]}/preview`; kind = "Google Drive file"; }
+  else if ((m = url.match(/docs\.google\.com\/(document|presentation|spreadsheets|forms)\/d\/(e\/)?([\w-]+)/))) {
+    const [, t, e, id] = m;
+    src = t === "forms" ? `https://docs.google.com/forms/d/${e ? "e/" : ""}${id}/viewform?embedded=true` : t === "presentation" ? `https://docs.google.com/presentation/d/${id}/embed?start=false&loop=false` : `https://docs.google.com/${t}/d/${id}/preview`;
+    kind = "Google " + { document: "Doc", presentation: "Slides", spreadsheets: "Sheet", forms: "Form" }[t];
+  } else if ((m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/))) { src = `https://player.vimeo.com/video/${m[1]}`; kind = "Vimeo video"; }
+  else throw new UserError("I can make embed codes for YouTube, Google Drive, Google Docs/Slides/Sheets/Forms and Vimeo links. For other websites, paste the normal link into Schoology's Link box.");
+  const code = `<iframe src="${src}" width="640" height="360" style="max-width:100%" frameborder="0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+  return { html: `<h3>✅ Embed code for a ${kind}</h3><pre id="code">${esc(code)}</pre><div class="actions"><button class="btn" type="button" id="copy">Copy code</button><a class="btn secondary" href="${esc(src)}" target="_blank" rel="noopener">Preview in a new tab</a></div>`, after: () => copyBtn(code) };
+}
+function copyBtn(text) {
+  $("#copy").onclick = async () => {
+    try { await navigator.clipboard.writeText(text); $("#copy").textContent = "Copied ✓"; }
+    catch { const s = getSelection(), r = document.createRange(); r.selectNodeContents($("#code")); s.removeAllRanges(); s.addRange(r); $("#copy").textContent = "Selected: press Ctrl+C"; }
+  };
+}
+async function qrCode(_, o) {
+  const text = (o.url || "").trim(); if (!text) throw new UserError("Please paste the link (or type the text) for the QR code.");
+  const qr = qrcode(0, "M"); qr.addData(unescape(encodeURIComponent(text)));
+  try { qr.make(); } catch { throw new UserError("That is too long for a QR code. Use a shorter link."); }
+  const n = qr.getModuleCount(), cell = 12, pad = 3 * cell, label = (o.label || "").trim(), extra = label ? 64 : 0;
+  const c = document.createElement("canvas"); c.width = n * cell + pad * 2; c.height = c.width + extra;
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.fillStyle = "#000";
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (qr.isDark(r, k)) g.fillRect(pad + k * cell, pad + r * cell, cell, cell);
+  if (label) { g.font = "600 30px 'Source Sans 3', Arial, sans-serif"; g.textAlign = "center"; g.fillText(label, c.width / 2, c.width + 30, c.width - 20); }
+  const blob = await canvasBlob(c, "image/png"), name = (label ? label.replace(/[\\/:*?"<>|]/g, "_") : "QR code") + ".png";
+  return { html: `<h3>✅ QR code ready</h3><img class="qr" alt="QR code" src="${URL.createObjectURL(blob)}"><p class="hint">Test it with your phone camera, then download it and paste it into Word or PowerPoint.</p><div class="actions"><button class="btn" type="button" id="saveBtn">⬇ Download</button></div>`, after: () => { $("#saveBtn").onclick = e => saveFile(name, blob, e.currentTarget); } };
+}
+function youtubeInfo() {
+  showHtml(`<h3>Using YouTube videos in class</h3>
+  <p>This toolkit does not download YouTube videos. YouTube's rules don't allow downloading (except with YouTube's own download button), and many videos belong to other people.</p>
+  <ul><li><b>Show it in Schoology:</b> use the <a href="#embed">Embed code maker</a>. Students watch it inside your Schoology page.</li>
+  <li><b>Start at the right moment:</b> in YouTube, use Share → Start at, copy that link, then make the embed code.</li>
+  <li><b>Your own videos:</b> download them from YouTube Studio (Content → ⋮ → Download), then edit them with the PC toolkit.</li>
+  <li><b>On a worksheet:</b> make a <a href="#qr">QR code</a> of the video link.</li></ul>`);
+}
+
+// ---------------------------------------------------------------- helpers
+function showHtml(html, after) { const r = $("#result"); r.className = "result ok"; r.hidden = false; r.innerHTML = html; if (after) after(); r.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+function showError(msg) { const r = $("#result"); r.className = "result bad"; r.hidden = false; r.innerHTML = `<h3>⚠️ That didn't work</h3><p></p>`; r.querySelector("p").textContent = msg; r.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+function setBusy(on, text) { $("#busy").hidden = !on; $("#goBtn").disabled = on; if (text) $("#busyText").textContent = text; if (on) $("#result").hidden = true; }
+function ext(n) { const i = n.lastIndexOf("."); return i < 0 ? "" : n.slice(i).toLowerCase(); }
+function size(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; }
+function clock(s) { s = Math.round(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
+
+function route() {
+  const t = ALL.find(x => x.id === location.hash.slice(1));
+  if (t) openTool(t); else { current = null; $("#tool").hidden = true; $("#home").hidden = false; }
+}
+$("#search").addEventListener("input", e => renderHome(e.target.value));
+$("#back").onclick = () => { location.hash = ""; };
+$("#homeLink").onclick = e => { e.preventDefault(); location.hash = ""; };
+$("#pick").onclick = () => $("#fileInput").click();
+$("#fileInput").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
+const drop = $("#drop");
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles([...e.dataTransfer.files]));
+window.addEventListener("dragover", e => e.preventDefault()); window.addEventListener("drop", e => e.preventDefault());
+$("#tForm").addEventListener("submit", submit);
+window.addEventListener("hashchange", route);
+if (!window.PDFLib) document.querySelector(".hero p").textContent = "Some tools could not load. Check your internet connection and reload the page.";
+renderHome(); route();
+</script>
+
+</body></html>
